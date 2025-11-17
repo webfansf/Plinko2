@@ -3,58 +3,83 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>ضريبة القيمة المضافة</title>
+<title>PLINKO</title>
 
 <style>
     body {
-        background: #000;
-        color: #fff;
+        margin: 0;
+        padding: 0;
         font-family: Arial, sans-serif;
         text-align: center;
-        padding: 30px;
+        color: #fff;
+        overflow-x: hidden;
     }
 
+    /* خلفية متحركة */
+    body::before {
+        content: "";
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(120deg, #001d33, #00334d, #005f73);
+        background-size: 300% 300%;
+        animation: bgMove 8s infinite alternate;
+        z-index: -1;
+    }
+
+    @keyframes bgMove {
+        0% { background-position: 0% 50%; }
+        100% { background-position: 100% 50%; }
+    }
+
+    /* PLINKO متحركة */
     h1 {
-        font-size: 40px;
-        margin-top: 20px;
-        color: #00ffea;
-        animation: glow 1.5s infinite;
+        font-size: 60px;
+        margin-top: 30px;
+        font-weight: bold;
+        color: #00fff2;
+        animation: plinkoMove 2.5s ease-in-out infinite;
+        letter-spacing: 4px;
+        text-shadow: 0 0 20px #00f5ff;
     }
 
-    @keyframes glow {
-        0% { text-shadow: 0 0 10px #00f2ff; }
-        50% { text-shadow: 0 0 20px #00eaff, 0 0 40px #00eaff; }
-        100% { text-shadow: 0 0 10px #00f2ff; }
+    @keyframes plinkoMove {
+        0% { transform: translateX(-10px); }
+        50% { transform: translateX(10px); }
+        100% { transform: translateX(-10px); }
     }
 
     .box {
-        background: rgba(255,255,255,0.08);
+        background: rgba(255,255,255,0.07);
         padding: 25px;
         border-radius: 15px;
         width: 90%;
         margin: 30px auto;
         border: 1px solid #00ffee;
+        backdrop-filter: blur(5px);
     }
 
     .amount {
         font-size: 55px;
         font-weight: bold;
         color: #00ff8c;
-        margin: 15px 0;
+        margin: 20px 0;
     }
 
     .note {
         font-size: 22px;
-        line-height: 1.7;
+        line-height: 1.8;
     }
 
     .btn {
         background: #00ffaa;
-        padding: 15px 25px;
+        padding: 15px 30px;
         border-radius: 12px;
         display: inline-block;
         margin-top: 25px;
-        font-size: 20px;
+        font-size: 24px;
         font-weight: bold;
         color: #000;
         text-decoration: none;
@@ -62,7 +87,7 @@
     }
 
     .btn:hover {
-        transform: scale(1.05);
+        transform: scale(1.08);
         background: #00ffcc;
     }
 </style>
@@ -70,21 +95,24 @@
 </head>
 <body>
 
-<h1>🔔 فاضل بس خطوة واحدة! 🔔</h1>
+<h1>PLINKO</h1>
 
 <div class="box">
+
+    <div class="note" style="font-size:24px; font-weight:bold;">
+        آخر خطوة لاستلام المكسب
+    </div>
+
     <div class="amount">1200 ج</div>
 
     <div class="note">
-        دي **ضريبة القيمة المضافة**  
-        ودي **آخر حاجة بتتدفع** وبتكون  
+        ضريبة القيمة المضافة  
+        ودي آخر حاجة بتتدفع علشان تقدر تسحب مكسبك.
         <br>
-        ⭐ <b>المرحلة الأخيرة للاستلام</b> ⭐
-        <br><br>
-        بعد الدفع بيتم **تفعيل السحب فوراً**.
+        بعد الدفع بيتم تفعيل السحب فوراً.
     </div>
 
-    <a class="btn">ادفع الضريبة الآن</a>
+    <a class="btn">سحب المكسب</a>
 </div>
 
 </body>
