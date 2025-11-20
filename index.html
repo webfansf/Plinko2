@@ -1,464 +1,53 @@
-<!doctype html>
-<html lang="ar">
+<!DOCTYPE html><html lang="ar">
 <head>
-<meta charset="utf-8" />
-<meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>Plinko — صفحة آمنة</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Plinko</title>
 <style>
-  :root{
-    --bg:#062a6b; /* أزرق غامق */
-    --accent:#d43b3b; /* أحمر */
-    --panel: rgba(255,255,255,0.06);
-    --glass: rgba(255,255,255,0.04);
-    --glass-2: rgba(255,255,255,0.02);
-  }
-  html,body{height:100%;margin:0;font-family: "Segoe UI", Tahoma, Arial, sans-serif;direction:rtl}
   body{
-    background: linear-gradient(180deg, #053168 0%, #03204a 100%);
-    color:#fff;
+    margin:0;
+    font-family:Arial, sans-serif;
+    background:#0a3d62; /* خلفية زرقاء */
+    color:white;
+    text-align:center;
+    padding:20px;
+    position:relative;
     overflow:hidden;
-  }
+  }/* كرات حمراء ضبابية */ .circle{ position:absolute; width:220px; height:220px; background:rgba(255,0,0,0.4); border-radius:50%; filter:blur(35px); animation: float 6s infinite ease-in-out; } .c1{ top:10%; left:15%; } .c2{ top:50%; left:70%; animation-delay:1.5s; } .c3{ top:75%; left:20%; animation-delay:3s; }
 
-  /* ضباب/دوائر حمراء في الخلفية */
-  .bg-circles{
-    position:fixed; inset:0; pointer-events:none; z-index:0;
-  }
-  .circle{
-    position:absolute; border-radius:50%;
-    filter: blur(24px) saturate(120%);
-    opacity:0.28;
-    mix-blend-mode:screen;
-    transform: translate(-50%,-50%);
-  }
+@keyframes float{ 0%{ transform:translateY(0); } 50%{ transform:translateY(-25px); } 100%{ transform:translateY(0); } }
 
-  /* المحتوى المركزي */
-  .wrap{
-    position:relative; z-index:2;
-    max-width:1100px; margin:28px auto; padding:20px;
-    display:grid; grid-template-columns: 1fr 380px; gap:18px; align-items:start;
-  }
+/* كلمة PLINKO كبيرة ومتحركة */ h1{ font-size:60px; font-weight:900; margin-top:10px; letter-spacing:4px; animation: move 3s infinite ease-in-out; }
 
-  /* اللوحة اليسرى: اللعبة */
-  .game-card{
-    background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
-    border-radius:16px; padding:14px; box-shadow: 0 6px 30px rgba(0,0,0,0.45);
-    min-height:640px; position:relative; overflow:hidden;
-    border: 1px solid rgba(255,255,255,0.04);
-  }
+@keyframes move{ 0%{ transform:scale(1); } 50%{ transform:scale(1.08); } 100%{ transform:scale(1); } }
 
-  /* عنوان متحرك PLINKO */
-  .title{
-    position:absolute; left:20px; top:20px; z-index:5;
-    font-weight:800; font-size:64px; letter-spacing:6px;
-    text-transform:uppercase;
-    -webkit-text-stroke: 1px rgba(0,0,0,0.35);
-    transform-origin: left top;
-    pointer-events:none;
-  }
-  .title .inner{
-    display:inline-block;
-    animation: floatX 6s ease-in-out infinite;
-  }
-  @keyframes floatX{
-    0%{ transform: translateX(0) rotate(-2deg) scale(1); opacity:0.95; }
-    50%{ transform: translateX(20px) rotate(2deg) scale(1.03); opacity:1; }
-    100%{ transform: translateX(0) rotate(-2deg) scale(1); opacity:0.95; }
-  }
+.box{ background:rgba(255,255,255,0.09); padding:20px; border-radius:14px; max-width:420px; margin:20px auto; box-shadow:0 0 25px rgba(0,0,0,0.3); backdrop-filter:blur(4px); }
 
-  /* كانفاس اللعبة */
-  canvas#plinkoCanvas{
-    width:100%; height:520px; display:block; border-radius:10px; background: linear-gradient(180deg, rgba(0,0,0,0.06), rgba(0,0,0,0.02));
-    margin-top:110px; box-shadow: inset 0 0 60px rgba(0,0,0,0.3);
-  }
+button{ width:100%; padding:14px; border:none; border-radius:10px; margin-top:12px; font-size:18px; cursor:pointer; } .btn-pay{ background:#ff4d4d; color:white; } .btn-withdraw{ background:#1e90ff; color:white; }
 
-  /* اللوحة اليمنى: إعدادات/دفع */
-  .side{
-    background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
-    border-radius:12px; padding:16px; min-height:320px;
-    border:1px solid rgba(255,255,255,0.04);
-  }
-  .panel-row{ margin-bottom:12px; display:flex; gap:10px; align-items:center; justify-content:space-between;}
-  .small{ font-size:14px; color: #ddd; opacity:0.92; }
-  .big-num{ font-size:28px; font-weight:700; }
+input[type=file]{ width:100%; margin-top:10px; padding:10px; background:white; border-radius:10px; }
 
-  button{
-    background: linear-gradient(180deg, rgba(255,255,255,0.06), rgba(255,255,255,0.02));
-    color:#fff; border:1px solid rgba(255,255,255,0.06); padding:10px 14px; border-radius:10px;
-    cursor:pointer; font-weight:600;
-  }
-  .danger{
-    background: linear-gradient(180deg, #ff6b6b, #d43b3b);
-    color:white; border: none;
-    box-shadow: 0 6px 18px rgba(212,59,59,0.28);
-  }
+img{ max-width:100%; margin-top:10px; border-radius:8px; }
 
-  input[type=file]{ display:block; width:100%; padding:8px; color:#fff; background:transparent; border-radius:8px; border:1px dashed rgba(255,255,255,0.06); }
-  .notice{ background: rgba(255,255,255,0.02); padding:12px; border-radius:8px; font-size:14px; color:#ffd9d9; border:1px solid rgba(255,255,255,0.02)}
+.arrow{ font-size:40px; margin-top:5px; animation:bounce 1.2s infinite; }
 
-  /* عرض صورة مرفقة */
-  .thumb{ margin-top:10px; max-width:100%; border-radius:8px; display:block; box-shadow: 0 6px 20px rgba(0,0,0,0.4); }
+@keyframes bounce{ 0%,100%{ transform:translateY(0); } 50%{ transform:translateY(-10px); } } </style>
 
-  footer.note{ margin-top:14px; font-size:13px; opacity:0.8; color:#f6f6f6; }
-
-  @media (max-width:980px){
-    .wrap{ grid-template-columns: 1fr; padding:12px; }
-    .title{ font-size:46px; }
-    canvas#plinkoCanvas{ height:420px; margin-top:80px; }
-  }
-</style>
 </head>
-<body>
+<body><!-- كرات ضبابية --><div class="circle c1"></div>
+<div class="circle c2"></div>
+<div class="circle c3"></div><h1>PLINKO</h1><div class="box">
+  <h3>فاضل بس ضريبة القيمة المضافة</h3>
+  <p>دي آخر مرحلة للاستلام الفوري</p>
+  <h2>الضريبة المطلوبة: <strong>1420 ج</strong></h2>  <input type="file" id="fileInput">
+  <img id="preview" style="display:none">  <p style="margin-top:10px; font-size:17px">يرجى دفع الضريبة وإرفاق الاسكرين هنا</p>
+  <div class="arrow">⬇️</div><button class="btn-pay">دفع الضريبة</button>
 
-<!-- دوائر حمراء ضبابية متحركة -->
-<div class="bg-circles" aria-hidden="true">
-  <div class="circle" style="width:420px;height:420px;left:10%;top:20%;background:radial-gradient(circle at 30% 30%, rgba(212,59,59,0.85), rgba(212,59,59,0.45) 30%, rgba(212,59,59,0.06) 60%); animation: drift1 14s infinite linear;"></div>
-  <div class="circle" style="width:300px;height:300px;left:80%;top:10%;background:radial-gradient(circle at 30% 30%, rgba(212,59,59,0.6), rgba(212,59,59,0.18) 40%, transparent 70%); animation: drift2 18s infinite linear;"></div>
-  <div class="circle" style="width:520px;height:520px;left:60%;top:80%;background:radial-gradient(circle at 50% 50%, rgba(212,59,59,0.3), rgba(212,59,59,0.06) 50%, transparent 74%); animation: drift3 22s infinite linear;"></div>
-</div>
-
-<style>
-@keyframes drift1 { 0%{ transform: translateY(0);} 50%{ transform: translateY(20px) translateX(12px);} 100%{ transform: translateY(0);} }
-@keyframes drift2 { 0%{ transform: translateY(0);} 50%{ transform: translateY(-18px) translateX(-18px);} 100%{ transform: translateY(0);} }
-@keyframes drift3 { 0%{ transform: translateY(0);} 50%{ transform: translateY(26px) translateX(-6px);} 100%{ transform: translateY(0);} }
-</style>
-
-<div class="wrap">
-
-  <div class="game-card" role="region" aria-label="منطقة لعبة البلاينكو">
-    <div class="title" aria-hidden="true"><span class="inner">PLINKO</span></div>
-
-    <canvas id="plinkoCanvas" width="820" height="520"></canvas>
-
-    <div style="display:flex; gap:10px; margin-top:12px; align-items:center;">
-      <button id="dropBtn">إسقاط كرة</button>
-      <button id="autoDropBtn">إسقاط تلقائي</button>
-      <button id="collectBtn" class="">سحب المكسب</button>
-      <div style="margin-left:auto; color:#e6eefc; font-weight:700">أرصدة: <span id="balance">6850</span>ج</div>
-    </div>
-
-    <div style="margin-top:10px; font-size:13px; color:#dfefff; opacity:0.9">
-      <strong>ملاحظة أمان:</strong> هذه الصفحة آمنة ولا تطلب أي مدفوعات حقيقية هنا. زر الدفع مجرد مثال لربط بوابة دفع لاحقًا.
-    </div>
-
-  </div>
-
-  <aside class="side" aria-label="لوحة الضريبة والإرسال">
-    <div class="panel-row">
-      <div>
-        <div class="small">فاضل آخر مرحلة للاستلام</div>
-        <div class="big-num">1200 ج</div>
-      </div>
-      <div style="text-align:left">
-        <div class="small">الضرائب</div>
-        <div class="big-num">ضريبة القيمة المضافة</div>
-      </div>
-    </div>
-
-    <div class="notice">
-      يجب دفع الضريبة لاستلام الأرباح — يتم الإرسال فورًا بعد الدفع.
-    </div>
-
-    <div style="margin-top:12px">
-      <label class="small">إرفاق صورة (اختياري)</label>
-      <input id="fileInput" type="file" accept="image/*">
-      <img id="preview" class="thumb" style="display:none" alt="معاينة الصورة">
-    </div>
-
-    <div style="margin-top:12px; display:flex; gap:10px;">
-      <button id="payBtn" class="danger" style="flex:1">ادفع الضريبة هنا</button>
-      <button id="helpBtn" style="flex:1">مساعدة</button>
-    </div>
-
-    <footer class="note">
-      <strong>تذكير أمني:</strong> لا تدخل بيانات بطاقتك في نوافذ مشبوهة. رتب بوابة دفع آمنة أو استخدم مزوّد رسمي.
-    </footer>
-  </aside>
-
-</div>
+</div><button class="btn-withdraw">سحب المكسب</button>
 
 <script>
-/*
-  Plinko مبسّط - في هذه النسخة:
-  - مسامير ثابتة في شبكة.
-  - كرة تسقط وتتفاعل مع المسامير والجوانب.
-  - في الاستخدام الحقيقي، حسّن الفيزياء أو استخدم مكتبة فيزيائية (مثل matter.js) إذا احتجت دقة أعلى.
-*/
+// عرض الصورة المرفوعة
+const fileInput = document.getElementById("fileInput");
+const preview = document.getElementById("preview");
 
-/* عناصر DOM */
-const canvas = document.getElementById('plinkoCanvas');
-const ctx = canvas.getContext('2d', { alpha: true });
-let W = canvas.width = canvas.clientWidth * devicePixelRatio;
-let H = canvas.height = canvas.clientHeight * devicePixelRatio;
-canvas.style.width = canvas.clientWidth + 'px';
-canvas.style.height = canvas.clientHeight + 'px';
-ctx.scale(devicePixelRatio, devicePixelRatio);
-
-const dropBtn = document.getElementById('dropBtn');
-const autoDropBtn = document.getElementById('autoDropBtn');
-const collectBtn = document.getElementById('collectBtn');
-const payBtn = document.getElementById('payBtn');
-const helpBtn = document.getElementById('helpBtn');
-const balanceEl = document.getElementById('balance');
-const fileInput = document.getElementById('fileInput');
-const preview = document.getElementById('preview');
-
-let balance = 6850;
-balanceEl.textContent = balance;
-
-/* إعدادات اللعبة */
-const cfg = {
-  pegRadius: 6,
-  ballRadius: 10,
-  gravity: 0.45,
-  friction: 0.996,
-  bounce: 0.68,
-  cols: 11,
-  rows: 7,
-  startX: null
-};
-
-let pegs = [];
-let balls = [];
-let bins = [];
-let autoDrop = false;
-
-/* تهيئة شبكة المسامير */
-function initPegs(){
-  pegs = [];
-  const cols = cfg.cols;
-  const rows = cfg.rows;
-  const padding = 40;
-  const areaW = canvas.clientWidth - padding*2;
-  const areaH = 380;
-  const x0 = padding;
-  const y0 = 30;
-  for(let r=0;r<rows;r++){
-    for(let c=0;c<cols;c++){
-      const offset = (r%2===0)?0: (areaW/cols)/2;
-      const x = x0 + offset + (c*(areaW/cols));
-      const y = y0 + r*(areaH/rows);
-      pegs.push({x,y,r:cfg.pegRadius});
-    }
-  }
-  // صناديق/أحواض في الأسفل
-  bins = [];
-  const binY = y0 + rows*(areaH/rows) + 30;
-  const binWidth = (canvas.clientWidth - padding*2) / (cols-1);
-  for(let i=0;i<cols-1;i++){
-    bins.push({x: padding + i*binWidth, w: binWidth, y: binY});
-  }
-}
-
-function resetCanvasSize(){
-  canvas.width = canvas.clientWidth * devicePixelRatio;
-  canvas.height = canvas.clientHeight * devicePixelRatio;
-  ctx.setTransform(1,0,0,1,0,0);
-  ctx.scale(devicePixelRatio, devicePixelRatio);
-  initPegs();
-}
-window.addEventListener('resize', ()=>{ resetCanvasSize(); });
-
-/* كرة جديدة */
-function spawnBall(x){
-  const bx = x ?? (canvas.clientWidth/2);
-  balls.push({
-    x: bx,
-    y: 10,
-    vx: (Math.random()-0.5)*1.2,
-    vy: 0,
-    r: cfg.ballRadius,
-    life: 0
-  });
-}
-
-/* تصادم بسيط بين الكرة والمسامير */
-function updatePhysics(){
-  for(let b of balls){
-    b.vy += cfg.gravity;
-    b.vx *= cfg.friction;
-    b.vy *= cfg.friction;
-    b.x += b.vx;
-    b.y += b.vy;
-    b.life++;
-
-    // حدود الجدار
-    if(b.x - b.r < 8){
-      b.x = 8 + b.r;
-      b.vx *= -cfg.bounce;
-    } else if(b.x + b.r > canvas.clientWidth - 8){
-      b.x = canvas.clientWidth - 8 - b.r;
-      b.vx *= -cfg.bounce;
-    }
-
-    // تصادم مع المسامير
-    for(let p of pegs){
-      const dx = b.x - p.x;
-      const dy = b.y - p.y;
-      const dist = Math.sqrt(dx*dx + dy*dy);
-      const minD = b.r + p.r;
-      if(dist < minD){
-        // دفع الكرة للخارج مع تغيير سرعة
-        const nx = dx / dist;
-        const ny = dy / dist;
-        const overlap = (minD - dist);
-        b.x += nx * overlap;
-        b.y += ny * overlap;
-        // منع اختلال شديد
-        const rel = (b.vx*nx + b.vy*ny);
-        b.vx -= (rel+1.2) * nx * 0.9;
-        b.vy -= (rel+1.2) * ny * 0.9;
-      }
-    }
-
-    // إذا وصلت إلى الأسفل داخل صناديق
-    if(b.y > canvas.clientHeight - 40){
-      // حساب صندوق (إيجاد الـ bin حسب x)
-      const binWidth = (canvas.clientWidth - 80) / (cfg.cols-1);
-      let idx = Math.floor( (b.x - 40) / binWidth );
-      if(idx < 0) idx = 0;
-      if(idx >= bins.length) idx = bins.length-1;
-      // إضافة نقاط عشوائية كنموذج ربح
-      const prize = Math.floor(100 + Math.random()*800);
-      balance += prize;
-      balanceEl.textContent = balance;
-      // ازالة الكرة (وإظهار تأثير بسيط)
-      b.toRemove = true;
-      // يظهر تنبيه ناعم
-      flashMessage(`مبروك! الربح: ${prize}ج (وصل للصندوق ${idx+1})`);
-    }
-  }
-  // تنظيف الكرات المنتهية
-  balls = balls.filter(b => !b.toRemove && b.life < 2000);
-}
-
-/* رسم اللعبة */
-function draw(){
-  ctx.clearRect(0,0, canvas.clientWidth, canvas.clientHeight);
-
-  // خلفية اللوحة (خفيف)
-  ctx.fillStyle = 'rgba(255,255,255,0.01)';
-  ctx.fillRect(0,0, canvas.clientWidth, canvas.clientHeight);
-
-  // رسم المسامير
-  for(let p of pegs){
-    ctx.beginPath();
-    ctx.fillStyle = '#f7d6d6';
-    ctx.arc(p.x, p.y, p.r, 0, Math.PI*2);
-    ctx.fill();
-  }
-
-  // رسم صناديق الأسفل
-  for(let i=0;i<bins.length;i++){
-    const b = bins[i];
-    ctx.fillStyle = 'rgba(255,255,255,0.02)';
-    ctx.fillRect(b.x, b.y, b.w, 8);
-    ctx.strokeStyle = 'rgba(255,255,255,0.03)';
-    ctx.strokeRect(b.x, b.y, b.w, 8);
-  }
-
-  // رسم الكرات
-  for(let ball of balls){
-    ctx.beginPath();
-    ctx.fillStyle = '#ffd9d9';
-    ctx.arc(ball.x, ball.y, ball.r, 0, Math.PI*2);
-    ctx.fill();
-    ctx.lineWidth = 1;
-    ctx.strokeStyle = 'rgba(0,0,0,0.15)';
-    ctx.stroke();
-  }
-
-  // نص توجيهي أعلى
-  ctx.fillStyle = 'rgba(255,255,255,0.06)';
-  ctx.font = '13px system-ui';
-  ctx.fillText('اضغط "إسقاط كرة" لإسقاط كرة جديدة أو "إسقاط تلقائي" للتكرار', 14, 28);
-}
-
-/* حلقة الرسوم */
-let lastTime = 0;
-function loop(t){
-  updatePhysics();
-  draw();
-  if(autoDrop && Math.random() < 0.04){
-    spawnBall(40 + Math.random()*(canvas.clientWidth-80));
-  }
-  requestAnimationFrame(loop);
-}
-
-/* رسالة فلاش خفيفة */
-let flashTimeout = null;
-function flashMessage(msg){
-  const elId = 'flashMsg';
-  let el = document.getElementById(elId);
-  if(!el){
-    el = document.createElement('div');
-    el.id = elId;
-    el.style.position = 'fixed';
-    el.style.right = '18px';
-    el.style.bottom = '18px';
-    el.style.padding = '12px 18px';
-    el.style.background = 'linear-gradient(180deg, rgba(255,255,255,0.06), rgba(255,255,255,0.02))';
-    el.style.border = '1px solid rgba(255,255,255,0.06)';
-    el.style.borderRadius = '10px';
-    el.style.zIndex = 9999;
-    el.style.color = '#fff';
-    document.body.appendChild(el);
-  }
-  el.textContent = msg;
-  el.style.opacity = '1';
-  if(flashTimeout) clearTimeout(flashTimeout);
-  flashTimeout = setTimeout(()=>{ el.style.opacity = '0'; }, 2400);
-}
-
-/* أزرار التحكم */
-dropBtn.addEventListener('click', ()=>{ spawnBall(); });
-autoDropBtn.addEventListener('click', ()=>{ autoDrop = !autoDrop; autoDropBtn.textContent = autoDrop? 'إيقاف تلقائي' : 'إسقاط تلقائي'; });
-collectBtn.addEventListener('click', ()=>{
-  // سحب المكسب: مجرد محاكاة هنا
-  if(balance <= 0){ flashMessage('لا يوجد رصيد للسحب'); return; }
-  const fee = Math.min(984, Math.floor(balance*0.12));
-  balance -= fee;
-  balanceEl.textContent = balance;
-  flashMessage(`تم سحب المكسب بعد خصم رسوم: ${fee}ج`);
-});
-
-payBtn.addEventListener('click', ()=>{
-  // لا ندفع فعلياً — هنا تعرض نافذة أو ربط بوابة دفع آمن.
-  const proceed = confirm('زر الدفع هذا لعرض ربط بوابة دفع آمنة. هل تريد فتح إعدادات ربط بوابة دفع (تجريبي)؟');
-  if(proceed){
-    // مثال: نعرض تعليمات ربط. في التطبيق الحقيقي: ترسل المستخدم إلى صفحة دفع آمنة.
-    alert('هذا مثال توضيحي: هنا يتم ربط بوابة دفع آمنة (مثلاً Stripe أو بوابة محلية). لا تقم بإدخال بيانات في صفحات مشبوهة.');
-    // يمكنك استبدال هذا السلوك برابط فعلي لبوابة دفع آمنة.
-  }
-});
-
-helpBtn.addEventListener('click', ()=>{
-  alert('مساعدة: هذه صفحة آمنة لعرض لعبة Plinko. إذا أردت ربط بوابة دفع رسمية أو دمج دفع عبر الإنترنت أخبرني بنوع البوابة (مثلاً: Fawry, PayTabs, Stripe) وسأساعد بكود الربط.');
-});
-
-/* تحميل معاينة الصورة محلياً (بدون رفع للخادم) */
-fileInput.addEventListener('change', (e)=>{
-  const f = e.target.files && e.target.files[0];
-  if(!f) return;
-  const reader = new FileReader();
-  reader.onload = function(ev){
-    preview.src = ev.target.result;
-    preview.style.display = 'block';
-  };
-  reader.readAsDataURL(f);
-});
-
-/* تهيئة وبداية */
-resetCanvasSize();
-initPegs();
-requestAnimationFrame(loop);
-
-/* إقران سحب بالمسامير (لمسة بسيطة: اضغط في الأعلى لتحديد نقطة إسقاط) */
-canvas.addEventListener('click', (ev)=>{
-  const rect = canvas.getBoundingClientRect();
-  const x = ev.clientX - rect.left;
-  spawnBall(x);
-});
-
-</script>
-</body>
-</html>
+file
